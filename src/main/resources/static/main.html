@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>websocket</title>
+<script type="text/javascript" src="jquery.js"></script>
+</head>
+<body style="text-align: center;">
+    users:<div  id="users"></div>
+   <div> <input  id="to" readonly="readonly"/>  <br/>
+	     <input  id="from" readonly="readonly"/> <br/>
+	     <input  id="msg" ><br/>
+	     <input type="button" value="send" id="send"/>
+   </div>
+	<h3>new message</h3>
+	<span id="newUser" ></span> ：
+	<span id="newMessage"></span>
+
+   <script type="text/javascript">
+
+
+			var path=window.location.host;
+			var tmp = window.location.href;
+			var uid=tmp.substr(tmp.indexOf('=')+1);
+			var websocket;
+
+			$(function(){
+				$.ajax({
+					url:"users",
+					dataType:"json",
+					success:function(data){
+						for(var r in data){
+							if(r !==uid){
+								var $button=$('<input type="button"  value="'+data[r]+'"/> ');
+								 $button.click(function(){
+									$("#to").val($button.val());
+								});
+								$("#users").append($button);
+							}
+
+						}
+					}
+				});
+            $("#from").val(uid);
+
+			if ('WebSocket' in window) {
+				websocket = new WebSocket("ws://" + path
+						+ "/ws?uid=" + uid);
+			} else if ('MozWebSocket' in window) {
+				websocket = new MozWebSocket("ws://" + path
+						+ "/ws?uid=" + uid);
+			} else {
+				websocket = new SockJS("http://" + path
+						+ "/ws/sockjs?uid=" + uid);
+			}
+			websocket.onopen = function(event) {
+				console.log("WebSocket:已连接");
+				console.log(event);
+			};
+			websocket.onmessage = function(event) {
+				var data = JSON.parse(event.data);
+				console.log(data);
+				$("#newUser").text(data.from);
+				$("#newMessage").text(data.text);
+				
+			};
+			websocket.onerror = function(event) {
+				console.log("WebSocket:发生错误 ");
+				console.log(event);
+			};
+			websocket.onclose = function(event) {
+				console.log("WebSocket:已关闭");
+				console.log(event);
+			}
+   			
+   			$("#send").click(function(){
+   		         if (websocket != null&&$("#msg").val().trim().length>0) {
+   		           var msg={
+   		             from:uid,
+   		             to:$("#to").val(),
+   		             text:$("#msg").val(),
+   		             date:'2016-12-12 12:12:12'
+   		           }      
+                    websocket.send(JSON.stringify(msg));
+                } 
+   		    });
+   			
+   			
+   			
+   		});
+   
+   
+   </script>
+</body>
+</html>

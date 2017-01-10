@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>登陆页面</title>
+<script type="text/javascript" src="jquery.js"></script>
+</head>
+<body  style="text-align: center;" >
+  <h2>login websocket</h2>
+  <div>user: <input  id="user" /><input type="button" id="login" value="login"></div>
+   
+   <script>
+      $(function(){
+         $("#login").click(function(){
+              var user=$("#user").val().trim();
+             if(user.length>0){
+                window.location='main.html?user='+user;
+             }
+         });
+
+      });
+
+
+   </script>
+  
+        
+   
+   
+  
+</body>
+</html>
